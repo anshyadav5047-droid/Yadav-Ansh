@@ -22,6 +22,18 @@ AI-powered fraud detection system for UPI transactions using Machine Learning.
 - `README.md` - Setup instructions
 - `.gitignore` - Git ignore file
 
+## Quick Start (Windows)
+
+### Method 1: Using Batch Script (Recommended)
+1. Double-click `start_server.bat` file
+2. Server will start automatically
+3. Open browser: http://127.0.0.1:8080
+
+### Method 2: Using Command Prompt
+1. Open Command Prompt in project folder
+2. Run: `python app.py`
+3. Open browser: http://127.0.0.1:8080
+
 ## Setup Instructions
 
 ### 1. Install Python
@@ -30,13 +42,18 @@ Download and install Python 3.8 or higher from https://python.org
 ### 2. Copy Project Files
 Copy these files/folders to your computer:
 - app.py
+- start_server.bat
+- train_model.py
+- dataset.csv
 - requirements.txt
 - templates/ (entire folder)
 - upi_fraud_detection_model.pkl
+- README.md
+- .gitignore
 
 **DO NOT copy** the .venv folder (if exists)
 
-### 3. Install Dependencies
+### 3. Install Dependencies (First time only)
 
 Open terminal/command prompt in project folder and run:
 
@@ -53,6 +70,10 @@ pip install -r requirements.txt
 
 ### 4. Run the Application
 
+**Option A: Double-click start_server.bat**
+- Simple and easy
+
+**Option B: Command line**
 ```powershell
 python app.py
 ```

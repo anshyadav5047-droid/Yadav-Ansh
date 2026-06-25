@@ -56,7 +56,12 @@ def predict():
         amount_ratio = amount / (oldbalanceOrg + 1)
         
         # Encode transaction type
-        type_encoded = label_encoder.transform([transaction_type])[0]
+        try:
+            type_encoded = label_encoder.transform([transaction_type])[0]
+        except ValueError:
+            # If transaction type is unknown, use default (TRANSFER)
+            print(f"Warning: Unknown transaction type '{transaction_type}', using default 'TRANSFER'")
+            type_encoded = label_encoder.transform(['TRANSFER'])[0]
         
         # Create feature array in the correct order (must match training features)
         features = np.array([[
@@ -104,4 +109,13 @@ if __name__ == '__main__':
     print("Server starting on http://127.0.0.1:8080")
     print("Press Ctrl+C to stop the server")
     print("="*60 + "\n")
-    app.run(debug=False, host='127.0.0.1', port=8080, use_reloader=False)
+    
+    # Run server with all stability options
+    app.run(
+        debug=False, 
+        host='127.0.0.1', 
+        port=8080, 
+        use_reloader=False, 
+        threaded=True,
+        processes=1
+    )
