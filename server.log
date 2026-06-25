@@ -1,0 +1,18 @@
+2026-06-25 18:37:13,960 - INFO - Model loaded successfully
+2026-06-25 18:37:14,054 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:8080
+2026-06-25 18:37:14,054 - INFO - [33mPress CTRL+C to quit[0m
+2026-06-25 18:37:36,064 - INFO - 127.0.0.1 - - [25/Jun/2026 18:37:36] "GET / HTTP/1.1" 200 -
+2026-06-25 18:37:37,279 - INFO - 127.0.0.1 - - [25/Jun/2026 18:37:37] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-06-25 18:37:50,320 - INFO - 127.0.0.1 - - [25/Jun/2026 18:37:50] "GET / HTTP/1.1" 200 -
+2026-06-25 18:39:28,905 - INFO - Model loaded successfully
+2026-06-25 18:39:29,030 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:8080
+2026-06-25 18:39:29,032 - INFO - [33mPress CTRL+C to quit[0m
+2026-06-25 18:39:39,867 - INFO - 127.0.0.1 - - [25/Jun/2026 18:39:39] "GET / HTTP/1.1" 200 -
+2026-06-25 18:39:40,247 - INFO - 127.0.0.1 - - [25/Jun/2026 18:39:40] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-06-25 18:40:10,031 - INFO - 127.0.0.1 - - [25/Jun/2026 18:40:10] "GET / HTTP/1.1" 200 -
+2026-06-25 18:40:10,594 - INFO - 127.0.0.1 - - [25/Jun/2026 18:40:10] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2026-06-25 18:40:22,472 - INFO - Received prediction request with data: {'amount': '50000', 'oldbalanceOrg': '100000', 'newbalanceOrig': '50000', 'oldbalanceDest': '10000', 'newbalanceDest': '60000'}
+2026-06-25 18:40:23,006 - INFO - Prediction: Fraudulent, Fraud Probability: 74.28%
+2026-06-25 18:40:23,012 - INFO - 127.0.0.1 - - [25/Jun/2026 18:40:23] "POST /predict HTTP/1.1" 200 -

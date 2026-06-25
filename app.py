@@ -3,7 +3,20 @@ import joblib
 import numpy as np
 import pandas as pd
 import warnings
+import logging
+import traceback
 warnings.filterwarnings('ignore')
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('server.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
@@ -15,20 +28,43 @@ try:
     label_encoder = model_data['label_encoder']
     feature_columns = model_data['feature_columns']
     print("Model loaded successfully!")
+    logger.info("Model loaded successfully")
 except Exception as e:
     print(f"Error loading model: {e}")
+    logger.error(f"Error loading model: {e}")
     print("Please run train_model.py first to generate the model file.")
     model = None
 
 @app.route('/')
 def index():
     """Render the main dashboard page"""
-    return render_template('index.html')
+    try:
+        return render_template('index.html')
+    except Exception as e:
+        logger.error(f"Error rendering index: {e}")
+        logger.error(traceback.format_exc())
+        return "Error loading page", 500
+
+@app.route('/health')
+def health():
+    """Health check endpoint"""
+    try:
+        if model is None:
+            return jsonify({'status': 'error', 'message': 'Model not loaded'}), 500
+        return jsonify({
+            'status': 'healthy',
+            'model_loaded': True,
+            'timestamp': pd.Timestamp.now().isoformat()
+        })
+    except Exception as e:
+        logger.error(f"Health check failed: {e}")
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 
 @app.route('/predict', methods=['POST'])
 def predict():
     """Predict fraud for a transaction"""
     if model is None:
+        logger.error("Model not loaded")
         return jsonify({
             'error': 'Model not loaded. Please train the model first.'
         }), 500
@@ -36,13 +72,25 @@ def predict():
     try:
         # Get data from request
         data = request.json
+        logger.info(f"Received prediction request with data: {data}")
         
-        # Extract features
-        amount = float(data['amount'])
-        oldbalanceOrg = float(data['oldbalanceOrg'])
-        newbalanceOrig = float(data['newbalanceOrig'])
-        oldbalanceDest = float(data['oldbalanceDest'])
-        newbalanceDest = float(data['newbalanceDest'])
+        # Validate required fields
+        required_fields = ['amount', 'oldbalanceOrg', 'newbalanceOrig', 'oldbalanceDest', 'newbalanceDest']
+        for field in required_fields:
+            if field not in data:
+                logger.error(f"Missing required field: {field}")
+                return jsonify({'error': f'Missing required field: {field}'}), 400
+        
+        # Extract features with validation
+        try:
+            amount = float(data['amount'])
+            oldbalanceOrg = float(data['oldbalanceOrg'])
+            newbalanceOrig = float(data['newbalanceOrig'])
+            oldbalanceDest = float(data['oldbalanceDest'])
+            newbalanceDest = float(data['newbalanceDest'])
+        except (ValueError, TypeError) as e:
+            logger.error(f"Invalid data type: {e}")
+            return jsonify({'error': 'Invalid data format. All fields must be numeric.'}), 400
         
         # For prediction, we need to create all features
         # Use default values for missing features (step, type, hour)
@@ -60,7 +108,7 @@ def predict():
             type_encoded = label_encoder.transform([transaction_type])[0]
         except ValueError:
             # If transaction type is unknown, use default (TRANSFER)
-            print(f"Warning: Unknown transaction type '{transaction_type}', using default 'TRANSFER'")
+            logger.warning(f"Unknown transaction type '{transaction_type}', using default 'TRANSFER'")
             type_encoded = label_encoder.transform(['TRANSFER'])[0]
         
         # Create feature array in the correct order (must match training features)
@@ -91,6 +139,8 @@ def predict():
         # Determine classification
         classification = 'Fraudulent' if prediction == 1 else 'Legitimate'
         
+        logger.info(f"Prediction: {classification}, Fraud Probability: {fraud_probability:.2f}%")
+        
         return jsonify({
             'classification': classification,
             'fraud_probability': round(fraud_probability, 2),
@@ -98,6 +148,8 @@ def predict():
         })
         
     except Exception as e:
+        logger.error(f"Prediction error: {str(e)}")
+        logger.error(traceback.format_exc())
         return jsonify({
             'error': f'Prediction error: {str(e)}'
         }), 500
