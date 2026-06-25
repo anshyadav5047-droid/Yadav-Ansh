@@ -51,16 +51,14 @@ def predict():
         hour = step % 24
         
         # Calculate derived features
-        balance_change_orig = oldbalanceOrg - newbalanceOrig
-        balance_change_dest = newbalanceDest - oldbalanceDest
-        
-        balance_ratio_orig = newbalanceOrig / oldbalanceOrg if oldbalanceOrg > 0 else 0
-        amount_to_oldbalance_orig = amount / oldbalanceOrg if oldbalanceOrg > 0 else 0
+        balance_diff_orig = oldbalanceOrg - newbalanceOrig
+        balance_diff_dest = newbalanceDest - oldbalanceDest
+        amount_ratio = amount / (oldbalanceOrg + 1)
         
         # Encode transaction type
         type_encoded = label_encoder.transform([transaction_type])[0]
         
-        # Create feature array in the correct order
+        # Create feature array in the correct order (must match training features)
         features = np.array([[
             step,
             type_encoded,
@@ -70,10 +68,9 @@ def predict():
             oldbalanceDest,
             newbalanceDest,
             hour,
-            balance_change_orig,
-            balance_change_dest,
-            balance_ratio_orig,
-            amount_to_oldbalance_orig
+            balance_diff_orig,
+            balance_diff_dest,
+            amount_ratio
         ]])
         
         # Create DataFrame with correct column names
